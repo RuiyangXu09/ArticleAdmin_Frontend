@@ -5,13 +5,22 @@
         <el-form-item>Register</el-form-item>
         <el-form-item>
             <el-input placeholder="Username" v-model = "registerData.username"/>
+        </el-form-item>
+        <el-form-item>
             <el-input placeholder="Password" v-model="registerData.password"/>
+        </el-form-item>
+        <el-form-item>
             <el-input placeholder="Nickname" v-model="registerData.nickname"/>
+        </el-form-item>
+        <el-form-item>
             <el-input placeholder="Email" v-model="registerData.email"/>
         </el-form-item>
         <el-form-item>
-            <el-button type="primary" @click =" register">
+            <el-button type="primary" @click ="register">
                 Register
+            </el-button>
+            <el-button>
+                Login
             </el-button>
         </el-form-item>
     </el-form>
@@ -22,6 +31,7 @@
 import {User, Lock} from "@element-plus/icons-vue";
 import {ref} from "vue";
 import {userRegisterService} from "@/api/user.js";
+import {ElMessage} from "element-plus";
 
 //定义数据模型用于接收表单中的数据
 const registerData = ref({
@@ -38,14 +48,14 @@ const register = async () =>{
     //判断result的响应数据中，是否包含code，如果包含code是否等于0
     if (result.code === 0){
         //code等于0，成功响应，前端返回响应体中msg
-        alert(result.msg? result.msg: 'Success!');
+        ElMessage.success(result.msg? result.msg: 'Success!');
     }else {
         //code等于-1或其他，失败响应，前端返回响应体中msg
-        alert(result.msg? result.msg: 'Failed Register.')
+        ElMessage.error(result.msg? result.msg: 'Failed Register.');
     }
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 
 </style>
