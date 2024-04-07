@@ -1,30 +1,33 @@
 <template>
-<el-row>
-    <!-- model绑定数据表单 -->
-    <el-form :model = "registerData">
-        <el-form-item>Register</el-form-item>
-        <el-form-item>
-            <el-input placeholder="Username" v-model = "registerData.username"/>
-        </el-form-item>
-        <el-form-item>
-            <el-input placeholder="Password" v-model="registerData.password"/>
-        </el-form-item>
-        <el-form-item>
-            <el-input placeholder="Nickname" v-model="registerData.nickname"/>
-        </el-form-item>
-        <el-form-item>
-            <el-input placeholder="Email" v-model="registerData.email"/>
-        </el-form-item>
-        <el-form-item>
-            <el-button type="primary" @click ="register">
-                Register
-            </el-button>
-            <el-button>
-                Login
-            </el-button>
-        </el-form-item>
-    </el-form>
-</el-row>
+    <el-container class=login-page>
+        <el-aside class="el-aside">Article Management Admin System</el-aside>
+        <el-main>
+            <el-header height="200px" class="el-header">Article Management Register</el-header>
+            <!-- :model绑定数据表单 -->
+            <el-form :model = "registerData">
+                <el-form-item class="el-form-item">
+                    <el-input placeholder="Username" v-model = "registerData.username"/>
+                </el-form-item>
+                <el-form-item class="el-form-item">
+                    <el-input placeholder="Password" v-model="registerData.password"/>
+                </el-form-item>
+                <el-form-item class="el-form-item">
+                    <el-input placeholder="Nickname" v-model="registerData.nickname"/>
+                </el-form-item>
+                <el-form-item class="el-form-item">
+                    <el-input placeholder="Email" v-model="registerData.email"/>
+                </el-form-item>
+                <el-form-item>
+                    <el-button type="primary" @click ="register">
+                        Register
+                    </el-button>
+                    <el-button @click="login">
+                        Login
+                    </el-button>
+                </el-form-item>
+            </el-form>
+        </el-main>
+    </el-container>
 </template>
 
 <script setup>
@@ -32,6 +35,9 @@ import {User, Lock} from "@element-plus/icons-vue";
 import {ref} from "vue";
 import {userRegisterService} from "@/api/user.js";
 import {ElMessage} from "element-plus";
+import {useRouter} from "vue-router";
+//调用路由器跳转到其他页面
+const router = useRouter();
 
 //定义数据模型用于接收表单中的数据
 const registerData = ref({
@@ -54,8 +60,33 @@ const register = async () =>{
         ElMessage.error(result.msg? result.msg: 'Failed Register.');
     }
 }
+
+//点击login按钮，页面跳转到login page，使用router
+const login = async () =>{
+    await router.push('/login');
+}
 </script>
 
 <style lang="scss" scoped>
-
+.login-page{
+    height: 100vh;
+    background-color: white;
+    font-family: "Arial",fantasy;
+    font-size: larger;
+    .el-aside{
+        width: 70%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    .el-header{
+        height: 200px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    .el-form-item{
+        margin-left: 80px;
+    }
+}
 </style>

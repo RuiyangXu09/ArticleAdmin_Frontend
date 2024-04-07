@@ -1,11 +1,10 @@
 <script setup>
-import Register from "@/views/Register.vue";
-import Login from '@/views/Login.vue';
+
 </script>
 
 <template>
-  <Register/>
-  <Login/>
+  <!-- 声明router的使用 -->
+  <router-view></router-view>
 </template>
 
 <style scoped>
