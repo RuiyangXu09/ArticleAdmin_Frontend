@@ -1,21 +1,21 @@
 <template>
-    <el-container class=login-page>
-        <el-aside class="el-aside">Article Management Admin System</el-aside>
+    <el-container class=register-page>
+        <el-aside class="el-aside-register">Article Management Admin System</el-aside>
         <el-main>
-            <el-header height="200px" class="el-header">Article Management Register</el-header>
+            <el-header height="200px" class="el-header-register">Article Management Register</el-header>
             <!-- :model绑定数据表单 -->
-            <el-form :model = "registerData">
-                <el-form-item class="el-form-item">
-                    <el-input placeholder="Username" v-model = "registerData.username"/>
+            <el-form :model = "registerData" class="el-form-register">
+                <el-form-item>
+                    <el-input placeholder="Username" :prefix-icon="User" v-model = "registerData.username"/>
                 </el-form-item>
-                <el-form-item class="el-form-item">
-                    <el-input placeholder="Password" v-model="registerData.password"/>
+                <el-form-item>
+                    <el-input placeholder="Password" :prefix-icon="Lock" v-model="registerData.password"/>
                 </el-form-item>
-                <el-form-item class="el-form-item">
-                    <el-input placeholder="Nickname" v-model="registerData.nickname"/>
+                <el-form-item>
+                    <el-input placeholder="Nickname" :prefix-icon="UserFilled" v-model="registerData.nickname" />
                 </el-form-item>
-                <el-form-item class="el-form-item">
-                    <el-input placeholder="Email" v-model="registerData.email"/>
+                <el-form-item>
+                    <el-input placeholder="Email" :prefix-icon="Message" v-model="registerData.email"/>
                 </el-form-item>
                 <el-form-item>
                     <el-button type="primary" @click ="register">
@@ -31,7 +31,7 @@
 </template>
 
 <script setup>
-import {User, Lock} from "@element-plus/icons-vue";
+import {User, Lock, UserFilled, Message} from "@element-plus/icons-vue";
 import {ref} from "vue";
 import {userRegisterService} from "@/api/user.js";
 import {ElMessage} from "element-plus";
@@ -67,26 +67,29 @@ const login = async () =>{
 }
 </script>
 
-<style lang="scss" scoped>
-.login-page{
+<style lang="less" scoped>
+.register-page{
     height: 100vh;
     background-color: white;
     font-family: "Arial",fantasy;
-    font-size: larger;
-    .el-aside{
+    font-size: 25px;
+    .el-aside-register{
         width: 70%;
         display: flex;
         justify-content: center;
         align-items: center;
     }
-    .el-header{
+    .el-header-register{
         height: 200px;
         display: flex;
         justify-content: center;
         align-items: center;
+        background-color: white;
     }
-    .el-form-item{
+    .el-form-register{
         margin-left: 80px;
+        justify-content: center;
+        align-items: center;
     }
 }
 </style>

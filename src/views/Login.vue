@@ -1,15 +1,15 @@
 <template>
     <el-container class="login-page">
-        <el-aside class="el-aside">Article Management Admin System</el-aside>
+        <el-aside class="el-aside-login">Article Management Admin System</el-aside>
         <el-main>
-            <el-header height="200px" class="el-header">Article Management Login</el-header>
+            <el-header height="200px" class="el-header-login">Article Management Login</el-header>
             <!-- :model绑定数据表单 -->
-            <el-form :model="loginData">
-                <el-form-item class="el-form-item">
-                    <el-input placeholder="Username" v-model="loginData.username"/>
+            <el-form :model="loginData" class="el-form-login">
+                <el-form-item>
+                    <el-input placeholder="Username" :prefix-icon="User" v-model="loginData.username"/>
                 </el-form-item>
-                <el-form-item class="el-form-item">
-                    <el-input placeholder="Password" v-model="loginData.password"/>
+                <el-form-item>
+                    <el-input placeholder="Password" :prefix-icon="Lock" v-model="loginData.password"/>
                 </el-form-item>
                 <el-form-item>
                     <el-button type="primary" @click="login">
@@ -28,6 +28,7 @@
 import {ref} from "vue";
 import {userLoginService} from "@/api/user.js";
 import {ElMessage} from "element-plus";
+import {User, Lock} from "@element-plus/icons-vue";
 import {useRouter} from "vue-router";
 //调用路由器跳转到其他页面
 const router = useRouter();
@@ -46,6 +47,7 @@ const login = async () =>{
     if (result.code === 0){
         //如果返回msg则显示响应体中msg内容，如果不是则返回自定义内容
         ElMessage.success(result.msg? result.msg: 'Login Success.');
+        await router.push('/home');
     }else {
         //如果返回msg则显示响应体中msg内容，如果不是则返回自定义内容
         ElMessage.error(result.msg? result.msg: 'Login Failed.');
@@ -53,30 +55,33 @@ const login = async () =>{
 }
 
 //路由跳转到register页面
-const register = async () =>{
+const register = async () => {
     await router.push('/register');
 }
 </script>
 
-<style lang="scss" scoped>
+<style lang="less" scoped>
 .login-page{
     height: 100vh;
     background-color: white;
     font-family: "Arial",fantasy;
-    font-size: larger;
-    .el-aside{
+    font-size: 25px;
+    .el-aside-login{
         width: 70%;
         display: flex;
         justify-content: center;
         align-items: center;
     }
-    .el-header{
+    .el-header-login{
         height: 200px;
         display: flex;
         justify-content: center;
         align-items: center;
+        background-color: white;
     }
-    .el-form-item{
+    .el-form-login{
+        justify-content: center;
+        align-items: center;
         margin-left: 80px;
     }
 }
