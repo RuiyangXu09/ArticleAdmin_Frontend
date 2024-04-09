@@ -5,9 +5,12 @@
 import axios from "axios";
 import {ElMessage} from "element-plus";
 import {useTokenStore} from "@/stores/token.js";
+import router from "@/router/index.js";
+
 //定义一个变量记录公共前缀
 const baseURL = '/api';
 const instance = axios.create({baseURL})
+//调用路由
 
 //添加响应拦截器
 instance.interceptors.response.use(
@@ -16,8 +19,15 @@ instance.interceptors.response.use(
         return result.data;
     },
     error => {
-        //失败响应
-        ElMessage.error('Server Error.')
+        //未登录处理，判断响应状态码，如果 == 401 则提示未登录，跳转到登录页面
+        if (error.response.status === 401){
+            ElMessage.warning('Please login.')
+            //使用路由跳转到登陆页面
+            router.push('/login')
+        }else {
+            //失败响应
+            ElMessage.error('Server Error.')
+        }
         //将异步的状态转换成失败的状态
         return Promise.reject(error);
     }
