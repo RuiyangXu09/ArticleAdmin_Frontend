@@ -30,7 +30,12 @@ import {userLoginService} from "@/api/user.js";
 import {ElMessage} from "element-plus";
 import {User, Lock} from "@element-plus/icons-vue";
 import {useRouter} from "vue-router";
-//调用路由器跳转到其他页面
+//导入pinia定义的token共享方法
+import {useTokenStore} from "@/stores/token.js";
+
+//调用useTokenStore函数得到的内容，由变量tokenStore接收
+const tokenStore = useTokenStore();
+//调用useRouter函数得到的内容，由变量router接收
 const router = useRouter();
 
 //封装响应数据模型
@@ -47,6 +52,9 @@ const login = async () =>{
     if (result.code === 0){
         //如果返回msg则显示响应体中msg内容，如果不是则返回自定义内容
         ElMessage.success(result.msg? result.msg: 'Login Success.');
+        //登录成功后，得到了token，应该放入pinia中共享在资源库，在需要携带token的地方使用
+        tokenStore.setToken(result.data);
+
         await router.push('/home');
     }else {
         //如果返回msg则显示响应体中msg内容，如果不是则返回自定义内容

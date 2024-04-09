@@ -32,23 +32,7 @@ import {ref} from "vue";
 import {categoryListService} from "@/api/category.js";
 
 //定义分类名的响应式数据模型
-const categories = ref([
-    {
-        "id": 1,
-        "categoryName": "category1",
-        "createUser": "user1"
-    },
-    {
-        "id": 2,
-        "categoryName": "category2",
-        "createUser": "user1"
-    },
-    {
-        "id": 3,
-        "categoryName": "category3",
-        "createUser": "user2"
-    }
-])
+const categories = ref()
 
 //声明一个异步函数，因为调用时需要同步等待调用结果
 const articleCategory = async () =>{

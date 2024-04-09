@@ -30,6 +30,19 @@ const routes = [
     },
     {path: '/register', component: Register},
     {path: '/login', component: Login},
+    {path: '/home', component: Home,
+        //redirect将会访问url空字符串时重定向到article管理页面
+        redirect: '/article/manage',
+        //引入子路由
+        children:[
+            //设置映射关系，设置好后，去home页面中的main部分，设置router-view标签
+            {path: '/article/category', component: ArticleCategory},
+            {path: '/article/manage', component: ArticleManagement},
+            {path: '/user/info', component: UserInfo},
+            {path: '/user/resetPassword', component: UserResetPassword},
+            {path: '/user/avatar', component: UserAvatar}
+        ]
+    },
 ]
 
 //创建路由器
