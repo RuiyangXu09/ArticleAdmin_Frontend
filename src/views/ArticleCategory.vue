@@ -28,6 +28,8 @@
 <script setup>
 import {Delete, Edit} from "@element-plus/icons-vue";
 import {ref} from "vue";
+//调用文章分类的api接口
+import {categoryListService} from "@/api/category.js";
 
 //定义分类名的响应式数据模型
 const categories = ref([
@@ -47,6 +49,16 @@ const categories = ref([
         "createUser": "user2"
     }
 ])
+
+//声明一个异步函数，因为调用时需要同步等待调用结果
+const articleCategory = async () =>{
+    //get方法请求，不需要传入参数，赋值给result变量使用
+    let result =  await categoryListService()
+    //将result.data赋值给数据模型的value进行渲染
+    categories.value = result.data;
+}
+//调用对应方法
+articleCategory();
 </script>
 
 <style lang="less" scoped>
