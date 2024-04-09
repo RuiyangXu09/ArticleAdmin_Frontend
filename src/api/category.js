@@ -11,5 +11,7 @@ export const categoryListService = () =>{
     const tokenStore = useTokenStore();
     const token = tokenStore.token;
     //后台api的请求路径，method为get，在请求头中携带token，在pinia中定义的响应式数据，不需要.value
-    return request.get('/category/getCategoryList', {headers:{'token': token}});
+    //return request.get('/category/getCategoryList', {headers:{'token': token}});
+    //在请求拦截器中验证了token
+    return request.get('/category/getCategoryList');
 }

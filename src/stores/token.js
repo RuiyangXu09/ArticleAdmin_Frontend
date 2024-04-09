@@ -30,4 +30,7 @@ export const useTokenStore = defineStore('token', ()=>{
         setToken,
         removeToken
     }
+},{
+    //持久化存储pinia
+    persist: true
 });
