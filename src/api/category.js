@@ -15,3 +15,13 @@ export const categoryListService = () =>{
     //在请求拦截器中验证了token
     return request.get('/category/getCategoryList');
 }
+
+/**
+ * 新增文章分类
+ * @param categoryName json格式的参数，接收表单中的数据模型后传递给后端
+ * @returns {Promise<axios.AxiosResponse<any>>}
+ */
+export const addCategoryService = (categoryNameData) => {
+    //将参数传递给后端
+  return request.post('/category/addCategory', categoryNameData);
+}
