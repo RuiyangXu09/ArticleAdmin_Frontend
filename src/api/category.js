@@ -8,8 +8,8 @@ import {useTokenStore} from "@/stores/token.js";
  */
 export const categoryListService = () =>{
     //在调用后台api请求获得数据前，获取token
-    const tokenStore = useTokenStore();
-    const token = tokenStore.token;
+    //const tokenStore = useTokenStore();
+    //const token = tokenStore.token;
     //后台api的请求路径，method为get，在请求头中携带token，在pinia中定义的响应式数据，不需要.value
     //return request.get('/category/getCategoryList', {headers:{'token': token}});
     //在请求拦截器中验证了token
@@ -33,4 +33,14 @@ export const addCategoryService = (categoryData) => {
  */
 export const updateCategoryService = (categoryData) =>{
     return request.put('/category/updateCategory', categoryData);
+}
+
+/**
+ * 删除文章分类
+ * @param id 前端获取并传入的id
+ * @returns {Promise<axios.AxiosResponse<any>>}
+ */
+export const deleteCategoryService = (id) =>{
+    //拼接id
+    return request.delete('/category/deleteCategory?id='+id);
 }

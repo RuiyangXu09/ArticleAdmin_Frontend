@@ -17,7 +17,7 @@
               <template #default="{row}">
                   <!-- 绑定编辑弹窗的单击事件 -->
                   <el-button :icon="Edit" circle plain type="primary" @click="editDialogById(row)"/>
-                  <el-button :icon="Delete" circle plain type="danger"/>
+                  <el-button :icon="Delete" circle plain type="danger" @click="deleteCategory(row)"/>
               </template>
           </el-table-column>
           <template #empty>
@@ -71,8 +71,8 @@
 import {Delete, Edit} from "@element-plus/icons-vue";
 import {ref} from "vue";
 //调用文章分类的api接口
-import {addCategoryService, categoryListService, updateCategoryService} from "@/api/category.js";
-import {ElMessage} from "element-plus";
+import {addCategoryService, categoryListService, updateCategoryService, deleteCategoryService} from "@/api/category.js";
+import {ElMessage, ElMessageBox} from "element-plus";
 
 /**
  * 获取分类列表的数据渲染
@@ -151,6 +151,40 @@ const updateCategory = async () => {
     editDialog.value = false;
     //重新对category模型中的参数进行赋值
     category.value.categoryName = '';
+}
+
+/**
+ * 删除分类的功能
+ */
+//消息提示框的使用
+const deleteCategory = (row) =>{
+    ElMessageBox.confirm(
+        'Do you want to Delete this Category?',
+        'Warning',
+        {
+            confirmButtonText: 'Confirm',
+            cancelButtonText: 'Cancel',
+            type: 'warning',
+        }
+    )
+        .then(async () => {
+            //点击确认后调用后台api接口完成删除
+            let result = await deleteCategoryService(row.id);
+            //删除api执行后，返回相应信息
+            if (result.code === 1){
+                ElMessage.error(result.msg ? result.msg : 'Update Category Failed.')
+            }else {
+                ElMessage.success(result.msg ? result.msg : 'Success.');
+            }
+            //刷新列表，再次调用获取列表的方法
+            await articleCategory();
+        })
+        .catch(() => {
+            ElMessage({
+                type: 'info',
+                message: 'Delete canceled',
+            })
+        })
 }
 </script>
 
