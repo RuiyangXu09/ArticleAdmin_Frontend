@@ -9,6 +9,7 @@
           </div>
       </template>
       <el-table :data="categories" border>
+          <!-- prop将把数据模型中对应的数据响应给组件 -->
           <el-table-column label="ID" prop="id" width="110px"/>
           <el-table-column label="Category Name" prop="categoryName"/>
           <el-table-column label="Create User" prop="createUser"/>
@@ -20,6 +21,7 @@
                   <el-button :icon="Delete" circle plain type="danger" @click="deleteCategory(row)"/>
               </template>
           </el-table-column>
+          <!-- 空数据渲染 -->
           <template #empty>
               <el-empty description="No Data..."/>
           </template>
