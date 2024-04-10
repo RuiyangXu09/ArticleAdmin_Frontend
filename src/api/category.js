@@ -18,10 +18,19 @@ export const categoryListService = () =>{
 
 /**
  * 新增文章分类
- * @param categoryName json格式的参数，接收表单中的数据模型后传递给后端
+ * @param categoryData 前端传入的数据模型，json格式
  * @returns {Promise<axios.AxiosResponse<any>>}
  */
-export const addCategoryService = (categoryNameData) => {
+export const addCategoryService = (categoryData) => {
     //将参数传递给后端
-  return request.post('/category/addCategory', categoryNameData);
+  return request.post('/category/addCategory', categoryData);
+}
+
+/**
+ * 修改文章分类名
+ * @param categoryData 前端传入的数据模型，json格式
+ * @returns {Promise<axios.AxiosResponse<any>>}
+ */
+export const updateCategoryService = (categoryData) =>{
+    return request.put('/category/updateCategory', categoryData);
 }
