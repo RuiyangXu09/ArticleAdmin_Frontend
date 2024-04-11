@@ -47,13 +47,15 @@
               <el-table-column label="Title" prop="title"/>
               <el-table-column label="Category" prop="categoryName"/>
               <el-table-column label="Create Time" prop="createTime"/>
+              <el-table-column label="Create User ID" prop="createUser" width="100px"/>
+              <el-table-column label="Create User" prop="username"/>
               <el-table-column label="State" prop="state"/>
               <el-table-column label="Operation" width="130px">
                   <!-- #default="{row}"用于获取当前点击的row所在的数据内容，也就能获取row对应的数据的id -->
                   <template #default="{row}">
                       <!-- 绑定编辑弹窗的单击事件 -->
                       <el-button :icon="Edit" circle plain type="primary"/>
-                      <el-button :icon="Delete" circle plain type="danger"/>
+                      <el-button :icon="Delete" circle plain type="danger" @click="deleteArticle(row)"/>
                   </template>
               </el-table-column>
               <!-- 空数据渲染 -->
@@ -72,7 +74,7 @@
 <script setup>
 import {Delete, Edit, Search} from "@element-plus/icons-vue";
 import {ref} from "vue";
-import {getArticleListService} from "@/api/article.js";
+import {getArticleListService, deleteArticleService} from "@/api/article.js";
 //用户搜索时选择的发布状态
 const state = ref('');
 /**
@@ -109,6 +111,7 @@ const onCurrentChange = (num) =>{
  */
 //在数据表格中，获取的时categoryId而不是name，需要调用查询所有分类名的接口，通过本接口中找到的id查找对应的分类名名字
 import {categoryListService} from "@/api/category.js";
+import {ElMessage, ElMessageBox} from "element-plus";
 //文章的数据响应模型
 const articles = ref()
 //获取文章的api的调用
@@ -122,6 +125,40 @@ const articleList = async () => {
 }
 //调用函数回显数据
 articleList();
+
+/**
+ * 删除文章的功能
+ * @param row 数据所在的row
+ */
+const deleteArticle = (row) =>{
+    ElMessageBox.confirm(
+        'Do you want to delete this Article?',
+        'Warning',
+        {
+            confirmButtonText: 'Confirm',
+            cancelButtonText: 'Cancel',
+            type: 'warning',
+        }
+    )
+        .then(async () =>{
+            //调用后台api的删除文章接口，row所在行的id值传入
+            let result = await deleteArticleService(row.id);
+            //删除成功或失败的响应
+            if (result.code === 1){
+                ElMessage.error(result.msg ? result.msg : 'Update Category Failed.')
+            }else {
+                ElMessage.success(result.msg ? result.msg : 'Success.');
+            }
+            //执行后，刷新列表数据
+            await articleList();
+        })
+        .catch(() =>{
+            ElMessage({
+                type: 'info',
+                message: 'Delete canceled',
+            })
+        })
+}
 </script>
 
 <style lang="less" scoped>

@@ -42,5 +42,5 @@ export const updateCategoryService = (categoryData) =>{
  */
 export const deleteCategoryService = (id) =>{
     //拼接id
-    return request.delete('/category/deleteCategory?id='+id);
+    return request.delete('/category/deleteCategory?id=' + id);
 }

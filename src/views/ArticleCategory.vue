@@ -12,7 +12,8 @@
           <!-- prop将把数据模型中对应的数据响应给组件 -->
           <el-table-column label="ID" prop="id" width="110px"/>
           <el-table-column label="Category Name" prop="categoryName"/>
-          <el-table-column label="Create User" prop="createUser"/>
+          <el-table-column label="Create User ID" prop="createUser" width="100px"/>
+          <el-table-column label="Create User" prop="username"/>
           <el-table-column label="Operation" width="130px">
               <!-- #default="{row}"用于获取当前点击的row所在的数据内容，也就能获取row对应的数据的id -->
               <template #default="{row}">
@@ -157,6 +158,7 @@ const updateCategory = async () => {
 
 /**
  * 删除分类的功能
+ * @param row 数据所在的row
  */
 //消息提示框的使用
 const deleteCategory = (row) =>{
@@ -170,7 +172,7 @@ const deleteCategory = (row) =>{
         }
     )
         .then(async () => {
-            //点击确认后调用后台api接口完成删除
+            //点击确认后调用后台api接口完成删除，row所在行的id值传入
             let result = await deleteCategoryService(row.id);
             //删除api执行后，返回相应信息
             if (result.code === 1){
