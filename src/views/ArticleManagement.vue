@@ -4,7 +4,8 @@
       <template #header>
           <div class="header">
               <span>Article Management</span>
-              <el-button type="primary">Publish Article</el-button>
+              <!-- 点击添加文章的button后，将addArticleVisible事件的值设为true -->
+              <el-button type="primary" @click="addArticleVisible = true">Publish Article</el-button>
           </div>
       </template>
       <!-- 条件搜索的下拉框 -->
@@ -68,13 +69,56 @@
                          layout="jumper, total, sizes, prev, pager, next" background :total="totalRows" @size-change="onSizeChange"
                          @current-change="onCurrentChange" style="margin-top: 20px; justify-content: flex-end"/>
       </div>
+      <div>
+          <!-- 添加文章的页面 -->
+          <!-- 抽屉组件 -->
+          <el-drawer v-model="addArticleVisible" title="Add Article" class="add-article">
+              <!-- 添加文章的表单 -->
+              <el-form v-model="articleDetails">
+                  <el-form-item label="Title">
+                      <el-input v-model="articleDetails.title" placeholder="Please input Article Title"/>
+                  </el-form-item>
+                  <!-- 文章分类选择器 -->
+                  <el-form-item label="Category">
+                      <el-select placeholder="Please Select Category" v-model="articleDetails.categoryId">
+                          <el-option v-for="c in categories" :key="c.id" :label="c.categoryName" :value="c.id"/>
+                      </el-select>
+                  </el-form-item>
+                  <!-- 文章封面图上传控制器 -->
+                  <el-form-item label="Cover Image">
+                      <el-upload :auto-upload="false" :show-file-list="false" class="coverImg-uploader">
+                          <img :src="articleDetails.coverImg" v-if="articleDetails.coverImg" class="coverImg">
+                          <el-icon v-else class="avatar-uploader-icon">
+                              <Plus />
+                          </el-icon>
+                      </el-upload>
+                  </el-form-item>
+                  <!-- 内容文本编辑 -->
+                  <el-form-item label="Article Content">
+                      <div class="editor">
+                          <quill-editor theme="snow" v-model:content="articleDetails.summary" contentType="html"/>
+                      </div>
+                  </el-form-item>
+                  <!-- 按钮框 -->
+                  <el-form-item>
+                      <el-button type="primary">Publish</el-button>
+                      <el-button type="info">Unpublished</el-button>
+                      <el-button type="default" @click="addArticleVisible = false">Cancel</el-button>
+                  </el-form-item>
+              </el-form>
+          </el-drawer>
+      </div>
   </el-card>
 </template>
 
 <script setup>
-import {Delete, Edit, Search} from "@element-plus/icons-vue";
+import {Delete, Edit, Plus, Search} from "@element-plus/icons-vue";
 import {ref} from "vue";
 import {getArticleListService, deleteArticleService} from "@/api/article.js";
+//导入富文本编辑器
+import {QuillEditor} from "@vueup/vue-quill";
+import '@vueup/vue-quill/dist/vue-quill.snow.css';
+
 //用户搜索时选择的发布状态
 const state = ref('');
 /**
@@ -159,16 +203,57 @@ const deleteArticle = (row) =>{
             })
         })
 }
+
+/**
+ * 添加文章的功能
+ */
+//添加文章的表单的数据模型
+const articleDetails = ref({
+    title: '',
+    summary: '',
+    categoryId: '',
+    coverImg: '',
+    state: ''
+})
+
+//控制添加文章的抽屉UI的显示，默认为false不展示
+const addArticleVisible = ref(false);
 </script>
 
 <style lang="less" scoped>
 .article-container{
   min-height: 100%;
   box-sizing: border-box;
-  .header{
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
+    .add-article{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .header{
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .coverImg-uploader{
+        .el-icon.avatar-uploader-icon {
+            font-size: 28px;
+            color: #8c939d;
+            width: 178px;
+            height: 178px;
+            text-align: center;
+        }
+        .coverImg{
+            width: 178px;
+            height: 178px;
+            display: block;
+        }
+    }
+    .editor{
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 300px;
+        overflow: auto;
+    }
 }
 </style>
