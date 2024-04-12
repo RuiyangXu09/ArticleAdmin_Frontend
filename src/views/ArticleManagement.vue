@@ -81,12 +81,25 @@
                   <!-- 文章分类选择器 -->
                   <el-form-item label="Category">
                       <el-select placeholder="Please Select Category" v-model="articleDetails.categoryId">
-                          <el-option v-for="c in categories" :key="c.id" :label="c.categoryName" :value="c.id"/>
+                          <el-option v-for="c in category" :key="c.id" :label="c.categoryName" :value="c.id"/>
                       </el-select>
                   </el-form-item>
                   <!-- 文章封面图上传控制器 -->
                   <el-form-item label="Cover Image">
-                      <el-upload :auto-upload="false" :show-file-list="false" class="coverImg-uploader">
+                      <!-- 上传图片组件的属性说明
+                      :auto-upload：设置是否自动上传
+                      action：设置服务器接口路径
+                      name：设置上传的文件字段名
+                      headers：设置上传的请求头
+                      on-success：设置上传成功的回调函数
+                       -->
+                      <el-upload :auto-upload="true"
+                                 :show-file-list="false"
+                                 action="/api/upload/coverImg"
+                                 name="file"
+                                 :headers="{'token': tokenStore.token}"
+                                 :on-success="uploadCoverImg"
+                                 class="coverImg-uploader">
                           <img :src="articleDetails.coverImg" v-if="articleDetails.coverImg" class="coverImg">
                           <el-icon v-else class="avatar-uploader-icon">
                               <Plus />
@@ -101,8 +114,8 @@
                   </el-form-item>
                   <!-- 按钮框 -->
                   <el-form-item>
-                      <el-button type="primary">Publish</el-button>
-                      <el-button type="info">Unpublished</el-button>
+                      <el-button type="primary" @click="addArticle('Published')">Published</el-button>
+                      <el-button type="info" @click="addArticle('Unpublished')">Unpublished</el-button>
                       <el-button type="default" @click="addArticleVisible = false">Cancel</el-button>
                   </el-form-item>
               </el-form>
@@ -114,10 +127,14 @@
 <script setup>
 import {Delete, Edit, Plus, Search} from "@element-plus/icons-vue";
 import {ref} from "vue";
-import {getArticleListService, deleteArticleService} from "@/api/article.js";
+import {getArticleListService, deleteArticleService, addArticleService} from "@/api/article.js";
 //导入富文本编辑器
 import {QuillEditor} from "@vueup/vue-quill";
 import '@vueup/vue-quill/dist/vue-quill.snow.css';
+//导入token
+import {useTokenStore} from "@/stores/token.js";
+//调用函数
+const tokenStore = useTokenStore();
 
 //用户搜索时选择的发布状态
 const state = ref('');
@@ -215,9 +232,33 @@ const articleDetails = ref({
     coverImg: '',
     state: ''
 })
-
 //控制添加文章的抽屉UI的显示，默认为false不展示
 const addArticleVisible = ref(false);
+//上传封面图片成功的回调函数，result是api调用成功后响应的结果，内含data，data中包含图片的url地址
+const uploadCoverImg = (result) =>{
+    //将data中的url地址赋值给coverImg
+    articleDetails.value.coverImg = result.data;
+    console.log(result.data)
+}
+//调用后台api，完成文章的添加，接收参数clickState确定点击的是Published
+const addArticle = async (clickState) =>{
+    //将发布状态赋值给文章的数据模型
+    articleDetails.value.state = clickState;
+    //调用api
+    let result = await addArticleService(articleDetails.value);
+    //判断响应状态码和对应的信息
+    if (result.code === 1){
+        ElMessage.error(result.msg? result.msg: 'Add Category Failed.')
+    }else {
+        ElMessage.success(result.msg? result.msg: 'Success.');
+    }
+    //让抽屉UI关闭
+    addArticleVisible.value = false;
+    //刷新列表
+    await articleList();
+    //重新对文章的数据模型赋值
+    articleDetails.value = '';
+}
 </script>
 
 <style lang="less" scoped>
@@ -241,6 +282,8 @@ const addArticleVisible = ref(false);
             width: 178px;
             height: 178px;
             text-align: center;
+            border: 1px dashed var(--el-border-color);
+            border-radius: 6px;
         }
         .coverImg{
             width: 178px;
