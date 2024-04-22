@@ -28,3 +28,11 @@ export const userLoginService = (loginData)=>{
     //将结果return给页面处理
     return request.post("/user/login", params);
 }
+
+/**
+ * 获取用户信息，用户信息存储在token中
+ * @returns {Promise<axios.AxiosResponse<any>>}
+ */
+export const getUserInfoByIdService = () => {
+  return request.get('/user/userInfoById');
+}

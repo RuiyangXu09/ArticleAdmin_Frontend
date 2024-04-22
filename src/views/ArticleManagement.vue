@@ -46,17 +46,24 @@
               <!-- prop将把数据模型中对应的数据响应给组件 -->
               <el-table-column label="ID" prop="id" width="110px"/>
               <el-table-column label="Title" prop="title"/>
+              <!-- 回显图片 -->
+              <el-table-column label="Cover Image" prop="coverImg">
+                  <template #default="scope">
+                      <div style="display: flex; align-items: center">
+                          <el-image :src="scope.row.coverImg"/>
+                      </div>
+                  </template>
+              </el-table-column>
               <el-table-column label="Category" prop="categoryName"/>
               <el-table-column label="Create Time" prop="createTime"/>
-              <el-table-column label="Create User ID" prop="createUser" width="100px"/>
               <el-table-column label="Create User" prop="username"/>
               <el-table-column label="State" prop="state"/>
               <el-table-column label="Operation" width="130px">
                   <!-- #default="{row}"用于获取当前点击的row所在的数据内容，也就能获取row对应的数据的id -->
                   <template #default="{row}">
                       <!-- 绑定编辑弹窗的单击事件 -->
-                      <el-button :icon="Edit" circle plain type="primary"/>
-                      <el-button :icon="Delete" circle plain type="danger" @click="deleteArticle(row)"/>
+                      <el-button :icon="Edit" circle plain type="primary" @click="editArticleById(row)"/>
+                      <el-button :icon="Delete" circle plain type="danger" @click="deleteArticleById(row)"/>
                   </template>
               </el-table-column>
               <!-- 空数据渲染 -->
@@ -81,7 +88,7 @@
                   <!-- 文章分类选择器 -->
                   <el-form-item label="Category">
                       <el-select placeholder="Please Select Category" v-model="articleDetails.categoryId">
-                          <el-option v-for="c in category" :key="c.id" :label="c.categoryName" :value="c.id"/>
+                          <el-option v-for="c in categories" :key="c.id" :label="c.categoryName" :value="c.id"/>
                       </el-select>
                   </el-form-item>
                   <!-- 文章封面图上传控制器 -->
@@ -121,13 +128,63 @@
               </el-form>
           </el-drawer>
       </div>
+      <!-- 编辑框 -->
+      <div>
+          <el-drawer v-model="editArticleVisible" title="Edit Article" class="add=article">
+              <el-form v-model="articleDetails">
+                  <el-form-item label="Title">
+                      <el-input v-model="articleDetails.title" placeholder="Please input Article Title"/>
+                  </el-form-item>
+                  <!-- 文章封面图上传控制器 -->
+                  <el-form-item label="Cover Image">
+                      <!-- 上传图片组件的属性说明
+                      :auto-upload：设置是否自动上传
+                      action：设置服务器接口路径
+                      name：设置上传的文件字段名
+                      headers：设置上传的请求头
+                      on-success：设置上传成功的回调函数
+                       -->
+                      <el-upload :auto-upload="true"
+                                 :show-file-list="false"
+                                 action="/api/upload/coverImg"
+                                 name="file"
+                                 :headers="{'token': tokenStore.token}"
+                                 :on-success="editCoverImg"
+                                 class="coverImg-uploader">
+                          <img :src="articleDetails.coverImg" v-if="articleDetails.coverImg" class="coverImg">
+                          <el-icon v-else class="avatar-uploader-icon">
+                              <Plus />
+                          </el-icon>
+                      </el-upload>
+                  </el-form-item>
+                  <!-- 内容文本编辑 -->
+                  <el-form-item label="Article Content">
+                      <div class="editor">
+                          <quill-editor theme="snow" v-model:content="articleDetails.summary" contentType="html"/>
+                      </div>
+                  </el-form-item>
+                  <!-- 按钮框 -->
+                  <el-form-item>
+                      <el-button type="primary" @click="editArticle('Published')">
+                          Published
+                      </el-button>
+                      <el-button type="info" @click="editArticle('Unpublished')">
+                          Unpublished
+                      </el-button>
+                      <el-button type="default" @click="editArticleVisible = false">
+                          Cancel
+                      </el-button>
+                  </el-form-item>
+              </el-form>
+          </el-drawer>
+      </div>
   </el-card>
 </template>
 
 <script setup>
 import {Delete, Edit, Plus, Search} from "@element-plus/icons-vue";
 import {ref} from "vue";
-import {getArticleListService, deleteArticleService, addArticleService} from "@/api/article.js";
+import {getArticleListService, deleteArticleService, addArticleService, editArticleService} from "@/api/article.js";
 //导入富文本编辑器
 import {QuillEditor} from "@vueup/vue-quill";
 import '@vueup/vue-quill/dist/vue-quill.snow.css';
@@ -191,7 +248,7 @@ articleList();
  * 删除文章的功能
  * @param row 数据所在的row
  */
-const deleteArticle = (row) =>{
+const deleteArticleById = (row) =>{
     ElMessageBox.confirm(
         'Do you want to delete this Article?',
         'Warning',
@@ -240,7 +297,7 @@ const uploadCoverImg = (result) =>{
     articleDetails.value.coverImg = result.data;
     console.log(result.data)
 }
-//调用后台api，完成文章的添加，接收参数clickState确定点击的是Published
+//调用后台api，完成文章的添加，接收参数clickState确定点击的是Published，如果点击的是Unpublished则state将会设置为Unpublished
 const addArticle = async (clickState) =>{
     //将发布状态赋值给文章的数据模型
     articleDetails.value.state = clickState;
@@ -257,6 +314,46 @@ const addArticle = async (clickState) =>{
     //刷新列表
     await articleList();
     //重新对文章的数据模型赋值
+    articleDetails.value = '';
+}
+
+/**
+ * 编辑文章的功能
+ */
+//编辑弹窗默认为关闭，只有除法编辑按钮才将value设置为true
+const editArticleVisible = ref(false);
+//获取row所在的数据中包含的id，将row作为参数传入，用于获取该row所显示的data
+const editArticleById = (row) => {
+    editArticleVisible.value = true;
+    //数据拷贝，获取对应row的值
+    articleDetails.value.title = row.title;
+    articleDetails.value.summary = row.summary;
+    articleDetails.value.coverImg = row.coverImg;
+    //扩展响应数据的model，将id作为额外参数传入api
+    articleDetails.value.id = row.id;
+}
+//上传封面图片成功的回调函数，result是api调用成功后响应的结果，内含data，data中包含图片的url地址
+const editCoverImg = (result) =>{
+    //将data中的url地址赋值给coverImg
+    articleDetails.value.coverImg = result.data;
+    console.log(result.data)
+}
+//修改文章的api调用
+const editArticle = async (clickState) =>{
+    //将发布状态赋值给文章的数据模型
+    articleDetails.value.state = clickState;
+    //调用api
+    let result = await editArticleService(articleDetails.value);
+    if (result.code === 1) {
+        ElMessage.error(result.msg ? result.msg : 'Update Article Failed.')
+    } else {
+        ElMessage.success(result.msg ? result.msg : 'Success.');
+    }
+    //隐藏弹窗
+    editArticleVisible.value = false;
+    //刷新列表
+    await articleList();
+    //清空数据模型
     articleDetails.value = '';
 }
 </script>

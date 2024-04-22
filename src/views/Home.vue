@@ -53,11 +53,11 @@
             <!-- 头部 -->
             <el-header class="el-header-home">
                 <!-- 当前登录用户信息 -->
-                <div>User: <strong>user1</strong></div>
+                <div>User: <strong>{{userInfoStore.info.nickname}}</strong></div>
                 <!-- 下拉菜单显示 -->
                 <el-dropdown placement="bottom-end">
                     <span>
-                        <el-avatar :src="avatar"/>
+                        <el-avatar :src="userInfoStore.info.avatarUrl"/>
                         <el-icon>
                             <CaretBottom/>
                         </el-icon>
@@ -83,6 +83,21 @@
 
 <script setup>
 import {Avatar, CaretBottom, Document, EditPen, Notebook, User, UserFilled, SwitchButton} from "@element-plus/icons-vue";
+import {getUserInfoByIdService} from "@/api/user.js";
+import {useUserInfoStore} from "@/stores/userInfo.js";
+
+//调用pinia存储
+const userInfoStore = useUserInfoStore();
+/**
+ * 调用函数，获取用户的详细信息
+ */
+const getUserInfo = async () =>{
+    let result = await getUserInfoByIdService();
+    //获取到的数据，存入pinia中，调用userInfoStore函数中的方法，存储result中获取的data数据
+    userInfoStore.setInfo(result.data);
+}
+//调用api
+getUserInfo();
 </script>
 
 <style lang="less">

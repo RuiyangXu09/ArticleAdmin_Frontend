@@ -22,3 +22,12 @@ export const deleteArticleService = (id) =>{
 export const addArticleService = (articleData) =>{
     return request.post('/article/addArticle', articleData);
 }
+
+/**
+ * 修改文章的接口
+ * @param articleData 前端传的json格式的article数据模型
+ * @returns {Promise<axios.AxiosResponse<any>>}
+ */
+export const editArticleService = (articleData) => {
+    return request.put('/article/updateArticle', articleData);
+}
